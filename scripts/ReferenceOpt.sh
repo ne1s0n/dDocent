@@ -209,7 +209,7 @@ else
 	NP=$NUMProc
 fi
 fastp -i uniq.fq -o uniq.fq1 -w $NP -Q &> assemble.trim.log
-mawk 'BEGIN{P=1}{if(P==1||P==2){gsub(/^[@]/,">");print}; if(P==4)P=0; P++}' uniq.fq1 | paste - - | sort -k1,1 -V | tr "\t" "\n" > uniq.fasta
+mawk 'BEGIN{P=1}{if(P==1||P==2){gsub(/^[@]/,">");print}; if(P==4)P=0; P++}' uniq.fq1 | paste - - | $sort -k1,1 -V | tr "\t" "\n" > uniq.fasta
 mawk '!/>/' uniq.fasta > totaluniqseq
 rm uniq.fq*
 
@@ -311,7 +311,7 @@ if [[ "$ATYPE" == "PE" || "$ATYPE" == "RPE" ]]; then
         paste other.F other.R | mawk '{if ($1 ~ />/) print $1; else print $0}' | sed -e 's/	/NNNNNNNNNN/g' > other.FR
 
         cat other.FR overlap.fasta rainbow.n.fasta > totalover.fasta
-	paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
+	paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | $sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
 	mv totalover.s.fasta totalover.fasta
         rm *.F *.R
 fi
@@ -367,14 +367,14 @@ if [[ "$ATYPE" == "HYB" ]];then
 		mv rainbow.RC.fasta rainbow.ua.fasta
 	
 		cat rainbow.ua.fasta uniq.fasta > totalover.fasta
-		paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
+		paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | $sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
 		mv totalover.s.fasta totalover.fasta
 	fi
 fi
 
 if [[ "$ATYPE" != "PE" && "$ATYPE" != "RPE" && "$ATYPE" != "HYB" ]]; then
 	cp uniq.fasta totalover.fasta
-	paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
+	paste <(mawk '{if (NR % 2) print $0}' totalover.fasta) <(mawk '{if (NR % 2 == 0) print $0}' totalover.fasta) | $sort -V | sed -e 's/	/\'$'\n/g' > totalover.s.fasta
 	mv totalover.s.fasta totalover.fasta
 fi
 cd-hit-est -i totalover.fasta -o reference.fasta.original -M 0 -T 0 -c $simC &>cdhit2.log
@@ -433,7 +433,7 @@ AF=$(mawk '{ sum += $1; n++ } END { if (n > 0) print sum / n; }' plot.kopt.data)
 echo "Average contig number = $AF"
 echo "The top three most common number of contigs"
 echo -e "X\tContig number"
-perl -e 'while (<>) {chomp; $z{$_}++;} while(($k,$v) = each(%z)) {print "$v\t$k\n";}' plot.kopt.data | sort -k1 -g -r | head -3
+perl -e 'while (<>) {chomp; $z{$_}++;} while(($k,$v) = each(%z)) {print "$v\t$k\n";}' plot.kopt.data | $sort -k1 -g -r | head -3
 echo "The top three most common number of contigs (with values rounded)"
 echo -e "X\tContig number"
-while read NAME; do python -c "print(round($NAME,-2))"; done < plot.kopt.data | perl -e 'while (<>) {chomp; $z{$_}++;} while(($k,$v) = each(%z)) {print "$v\t$k\n";}' | sort -g -r | head -3 | sed "s/^[ \t]*//"
+while read NAME; do python -c "print(round($NAME,-2))"; done < plot.kopt.data | perl -e 'while (<>) {chomp; $z{$_}++;} while(($k,$v) = each(%z)) {print "$v\t$k\n";}' | $sort -g -r | head -3 | sed "s/^[ \t]*//"
